@@ -35,6 +35,10 @@ class Post
     #[ApiProperty(iri: 'http://schema.org/image')]
     public ?MediaObject $image = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
+    #[ORM\JoinColumn(nullable: false)]
+    private $owner;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -84,6 +88,18 @@ class Post
     public function setLocation(string $location): self
     {
         $this->location = $location;
+
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): self
+    {
+        $this->owner = $owner;
 
         return $this;
     }
