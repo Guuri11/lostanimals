@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource(
@@ -21,6 +22,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
         'delete' => ["security" => "object.owner == user", "security_message" => "You are not able to delete this post",],
     ],
     collectionOperations: ['post', 'get'],
+    normalizationContext: ['groups' => ['read']],
+    denormalizationContext: ['groups' => ['write']],
 )]
 #[ApiFilter(DateFilter::class, properties: ['created_at'])]
 #[ApiFilter(SearchFilter::class, properties: ['owner.username' => 'partial', 'type' => 'exact', 'state' => 'exact'])]
@@ -32,32 +35,40 @@ class Post
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(["read", "write"])]
     private $description;
 
     #[ORM\Column(type: 'string', length: 10)]
+    #[Groups(["read", "write"])]
     private $type;
 
     #[ORM\Column(type: 'boolean')]
+    #[Groups(["read", "write"])]
     private $state;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(["read", "write"])]
     private $location;
 
     #[ORM\ManyToOne(targetEntity: MediaObject::class)]
     #[ORM\JoinColumn(nullable: false)]
     #[ApiProperty(iri: 'http://schema.org/image')]
     #[ApiSubresource]
+    #[Groups(["read", "write"])]
     public ?MediaObject $image = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
     #[ApiSubresource]
+    #[Groups(["read", "write"])]
     private $owner;
 
     #[ORM\Column(type: 'datetime_immutable')]
+    #[Groups(["read"])]
     private $created_at;
 
     #[ORM\Column(type: 'datetime_immutable')]
+    #[Groups(["read"])]
     private $updated_at;
 
     public function getId(): ?int

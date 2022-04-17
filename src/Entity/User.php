@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\SerializedName;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
@@ -24,6 +25,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
         'delete' => ["security" => "object == user", "security_message" => "You are not delete to modify this data",],
     ],
     collectionOperations: ['post', 'get'],
+    normalizationContext: ['groups' => ['read']],
+    denormalizationContext: ['groups' => ['write']],
 )]
 #[ApiFilter(SearchFilter::class, properties: ['username' => 'partial'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -34,6 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $id;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
+    #[Groups(["read", "write"])]
     private $username;
 
     #[ORM\Column(type: 'json')]
@@ -43,20 +47,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $password;
 
     #[SerializedName('password')]
+    #[Groups(["write"])]
     private $plainPassword;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Post::class)]
+    #[Groups(["read", "write"])]
     private $posts;
 
     #[ORM\ManyToOne(targetEntity: MediaObject::class)]
     #[ORM\JoinColumn(nullable: true)]
     #[ApiProperty(iri: 'http://schema.org/image')]
+    #[Groups(["read", "write"])]
     public ?MediaObject $image = null;
 
     #[ORM\Column(type: 'datetime_immutable')]
+    #[Groups(["read"])]
     private $created_at;
 
     #[ORM\Column(type: 'datetime_immutable')]
+    #[Groups(["read"])]
     private $updated_at;
 
     public function __construct()
