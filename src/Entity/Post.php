@@ -13,6 +13,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource(
@@ -36,18 +37,27 @@ class Post
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(["read", "write"])]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Length([min: 0, max: 255])]
     private $description;
 
     #[ORM\Column(type: 'string', length: 10)]
     #[Groups(["read", "write"])]
+    #[Assert\NotBlank]
+    #[Assert\NotNull]
+    #[Assert\Choice(['LOST', 'FOUND'])]
     private $type;
 
     #[ORM\Column(type: 'boolean')]
     #[Groups(["read", "write"])]
+    #[Assert\NotNull]
     private $state;
 
     #[ORM\Column(type: 'string', length: 255)]
     #[Groups(["read", "write"])]
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
     private $location;
 
     #[ORM\ManyToOne(targetEntity: MediaObject::class)]
@@ -61,6 +71,7 @@ class Post
     #[ORM\JoinColumn(nullable: false)]
     #[ApiSubresource]
     #[Groups(["read", "write"])]
+    #[Assert\NotNull]
     private $owner;
 
     #[ORM\Column(type: 'datetime_immutable')]

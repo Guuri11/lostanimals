@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Annotation\SerializedName;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
@@ -38,6 +39,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     #[Groups(["read", "write"])]
+    #[Assert\NotBlank]
+    #[Assert\Unique]
     private $username;
 
     #[ORM\Column(type: 'json')]
@@ -48,6 +51,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[SerializedName('password')]
     #[Groups(["write"])]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 6)]
     private $plainPassword;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Post::class)]
