@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource(
@@ -20,7 +21,8 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
     ],
     collectionOperations: ['post', 'get'],
 )]
-#[ApiFilter(DateFilter::class, properties: ['dateProperty'])]
+#[ApiFilter(DateFilter::class, properties: ['created_at'])]
+#[ApiFilter(SearchFilter::class, properties: ['owner.username' => 'partial', 'type' => 'exact', 'state' => 'exact'])]
 class Post
 {
     #[ORM\Id]
