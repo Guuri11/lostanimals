@@ -20,7 +20,6 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
     normalizationContext: ['groups' => ['media_object:read']],
     itemOperations: ['get'],
     collectionOperations: [
-        'get',
         'post' => [
             'controller' => CreateMediaObjectAction::class,
             'deserialize' => false,

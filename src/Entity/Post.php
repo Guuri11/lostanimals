@@ -10,7 +10,14 @@ use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
-#[ApiResource]
+#[ApiResource(
+    itemOperations: [
+        'get',
+        'put' => ["security" => "object.owner == user", "security_message" => "You are not able to modify this post",],
+        'delete' => ["security" => "object.owner == user", "security_message" => "You are not able to delete this post",],
+    ],
+    collectionOperations: ['post', 'get'],
+)]
 class Post
 {
     #[ORM\Id]
