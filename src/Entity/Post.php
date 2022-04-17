@@ -39,7 +39,7 @@ class Post
     #[Groups(["read", "write"])]
     #[Assert\NotBlank]
     #[Assert\NotNull]
-    #[Assert\Length([min: 0, max: 255])]
+    #[Assert\Length(["min"=> 0, "max" => 255])]
     private $description;
 
     #[ORM\Column(type: 'string', length: 10)]
