@@ -33,7 +33,7 @@ use App\Controller\MeController;
         'get',
         'me' => [
             'pagination_enabled' => false,
-            'path' => '/me',
+            'path' => '/users/me',
             'method' => 'GET',
             'controller' => MeController::class,
             'read' => false,
