@@ -13,3 +13,5 @@ api_platform:
                 type: header
 
         versions: [3]
+    eager_loading:
+        force_eager: false

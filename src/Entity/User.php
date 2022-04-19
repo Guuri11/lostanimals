@@ -23,7 +23,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
     itemOperations: [
-        'get',
+        'get' => ["security" => "object == user", "security_message" => "You are not able to see this data",],
         'put' => ["security" => "object == user", "security_message" => "You are not able to modify this data",],
         'delete' => ["security" => "object == user", "security_message" => "You are not delete to modify this data",],
     ],
