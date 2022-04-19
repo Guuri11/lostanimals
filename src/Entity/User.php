@@ -19,6 +19,7 @@ use DateTimeImmutable;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Controller\MeController;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ApiResource(
@@ -27,7 +28,20 @@ use Symfony\Component\Validator\Constraints as Assert;
         'put' => ["security" => "object == user", "security_message" => "You are not able to modify this data",],
         'delete' => ["security" => "object == user", "security_message" => "You are not delete to modify this data",],
     ],
-    collectionOperations: ['post', 'get'],
+    collectionOperations: [
+        'post',
+        'get',
+        'me' => [
+            'pagination_enabled' => false,
+            'path' => '/me',
+            'method' => 'GET',
+            'controller' => MeController::class,
+            'read' => false,
+            'openapi_context' => [
+                'summary' => 'Get your data as user'
+            ]
+        ]
+    ],
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']],
 )]
