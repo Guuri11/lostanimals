@@ -14,13 +14,17 @@ use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\SerializedName;
+use App\ApiPlatform\RadiusLocationSearchFilter;
+use DateTimeImmutable;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource(
+    attributes: ["pagination_enabled" => false],
     itemOperations: [
         'get',
-        'put' => ["security" => "object.owner == user", "security_message" => "You are not able to modify this post",],
-        'delete' => ["security" => "object.owner == user", "security_message" => "You are not able to delete this post",],
+        'put' => ["security" => "object.getOwner() == user", "security_message" => "You are not able to modify this post",],
+        'delete' => ["security" => "object.getOwner() == user", "security_message" => "You are not able to delete this post",],
     ],
     collectionOperations: ['post', 'get'],
     normalizationContext: ['groups' => ['read']],
@@ -28,6 +32,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 )]
 #[ApiFilter(DateFilter::class, properties: ['created_at'])]
 #[ApiFilter(SearchFilter::class, properties: ['owner.username' => 'partial', 'type' => 'exact', 'state' => 'exact'])]
+#[ApiFilter(RadiusLocationSearchFilter::class)]
 class Post
 {
     #[ORM\Id]
@@ -54,11 +59,11 @@ class Post
     #[Assert\NotNull]
     private $state;
 
-    #[ORM\Column(type: 'string', length: 255)]
+    #[ORM\Column(type: 'float')]
     #[Groups(["read", "write"])]
     #[Assert\NotNull]
     #[Assert\NotBlank]
-    private $location;
+    private $latitude;
 
     #[ORM\ManyToOne(targetEntity: MediaObject::class)]
     #[ORM\JoinColumn(nullable: false)]
@@ -66,6 +71,9 @@ class Post
     #[ApiSubresource]
     #[Groups(["read", "write"])]
     public ?MediaObject $image = null;
+
+    #[Groups(["read"])]
+    private $imageUrl;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
@@ -81,6 +89,18 @@ class Post
     #[ORM\Column(type: 'datetime_immutable')]
     #[Groups(["read"])]
     private $updated_at;
+
+    #[ORM\Column(type: 'float')]
+    #[Groups(["read", "write"])]
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
+    private $longitude;
+
+    public function __construct()
+    {
+        $this->created_at = new DateTimeImmutable();
+        $this->updated_at = new DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -123,14 +143,14 @@ class Post
         return $this;
     }
 
-    public function getLocation(): ?string
+    public function getLatitude(): ?string
     {
-        return $this->location;
+        return $this->latitude;
     }
 
-    public function setLocation(string $location): self
+    public function setLatitude(string $latitude): self
     {
-        $this->location = $location;
+        $this->latitude = $latitude;
 
         return $this;
     }
@@ -167,6 +187,28 @@ class Post
     public function setUpdatedAt(\DateTimeImmutable $updated_at): self
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    /**
+     * Get logo url from workshop
+     * 
+     * @SerializedName("imageUrl")
+     */
+    public function getImageUrl()
+    {
+        return $this->image->filePath;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(float $longitude): self
+    {
+        $this->longitude = $longitude;
 
         return $this;
     }
